@@ -1,0 +1,6 @@
+Flask
+Flask-Cors
+python-dotenv
+qrcode[pil]
+huggingface_hub
+requests

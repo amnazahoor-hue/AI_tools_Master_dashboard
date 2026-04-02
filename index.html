@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="h-screen bg-slate-950 text-slate-100 antialiased">
+    <div class="flex h-full w-full flex-col md:flex-row">
+      <!-- Sidebar -->
+      <aside class="w-full shrink-0 border-b border-white/10 bg-slate-900/80 md:w-80 md:border-b-0 md:border-r md:border-white/10">
+        <div class="px-5 py-5">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/30 to-cyan-400/20 ring-1 ring-white/10">
+              <i data-lucide="sparkles" class="h-5 w-5 text-cyan-200"></i>
+            </div>
+            <div class="leading-tight">
+              <div class="text-sm font-semibold text-indigo-200">Dashboard Overview</div>
+              <div class="text-xs text-slate-400">All projects via iframe</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-3 pb-3">
+          <div class="rounded-2xl bg-white/[0.03] p-2 ring-1 ring-white/10">
+            <button
+              id="homeBtn"
+              type="button"
+              class="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/[0.07]"
+              data-view="home"
+            >
+              <i data-lucide="layout-grid" class="h-5 w-5 text-indigo-200"></i>
+              Home
+            </button>
+          </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto px-3 pb-6">
+          <div class="space-y-2 px-1">
+            <template id="sidebarButtonTemplate">
+              <button
+                type="button"
+                class="project-btn group flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm transition hover:bg-white/[0.06]"
+                data-key=""
+              >
+                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.04] ring-1 ring-white/10 transition group-hover:ring-white/15">
+                  <i data-lucide="iconName" class="h-4 w-4 text-slate-200"></i>
+                </span>
+                <span class="flex-1 text-left">
+                  <span class="block truncate font-medium text-slate-100"></span>
+                  <span class="block truncate text-xs text-slate-400"></span>
+                </span>
+              </button>
+            </template>
+            <div id="sidebarButtons"></div>
+          </div>
+        </nav>
+
+        <div class="px-5 pb-5 pt-2">
+          <div class="text-xs text-slate-400">
+            Tip: first load can be slow if a project downloads/initializes models.
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="relative flex-1">
+        <header class="flex items-center justify-between border-b border-white/10 bg-slate-950/60 px-5 py-4">
+          <div>
+            <div class="text-sm font-semibold" id="activeTitle">Select a project</div>
+            <div class="text-xs text-slate-400" id="activeSubtitle">Use Home for a gallery overview</div>
+          </div>
+          <div class="hidden text-xs text-slate-400 sm:block" id="activeUrlHint">—</div>
+        </header>
+
+        <!-- Home Gallery -->
+        <section id="homeView" class="p-5">
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-semibold">Project Gallery</h2>
+              <p class="text-sm text-slate-400">Click a card to load the project in the iframe.</p>
+            </div>
+            <div class="hidden text-xs text-slate-400 md:block">
+              Sidebar highlights the active project.
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <template id="cardTemplate">
+              <button
+                type="button"
+                class="card project-card group flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:-translate-y-[1px] hover:bg-white/[0.06] hover:ring-1 hover:ring-cyan-300/20"
+                data-key=""
+              >
+                <div class="flex items-start gap-3">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-cyan-400/10 ring-1 ring-white/10">
+                    <i data-lucide="iconName" class="h-5 w-5 text-cyan-200"></i>
+                  </span>
+                  <div class="min-w-0">
+                    <div class="truncate text-sm font-semibold text-slate-100"></div>
+                    <div class="text-xs text-slate-400"></div>
+                  </div>
+                </div>
+                <p class="desc-clamp mt-3 text-sm text-slate-300">
+                  description
+                </p>
+                <div class="mt-4 flex items-center justify-between">
+                  <span class="text-xs font-medium text-cyan-200/90">Open in iframe</span>
+                  <span class="text-xs text-slate-500">→</span>
+                </div>
+              </button>
+            </template>
+
+            <div id="cardsGrid"></div>
+          </div>
+        </section>
+
+        <!-- Iframe View -->
+        <section id="iframeView" class="hidden p-0">
+          <div class="relative">
+            <div id="loadingOverlay" class="absolute inset-0 z-20 hidden bg-slate-950/60 backdrop-blur-sm">
+              <div class="flex h-full w-full items-center justify-center">
+                <div class="w-full max-w-xl rounded-2xl border border-white/10 bg-slate-900/60 p-5 ring-1 ring-white/10">
+                  <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/15 ring-1 ring-cyan-300/25">
+                      <div class="h-5 w-5 animate-spin rounded-full border-2 border-cyan-200/90 border-t-transparent"></div>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold text-slate-100">Loading project</div>
+                      <div class="text-xs text-slate-400">Preparing a smooth transition…</div>
+                    </div>
+                  </div>
+                  <div class="mt-4">
+                    <div class="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                      <div id="loadingBar" class="h-full w-0 bg-gradient-to-r from-cyan-400 to-indigo-400"></div>
+                    </div>
+                    <div class="mt-2 text-xs text-slate-400">Please wait ~2 seconds.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <iframe
+              id="appFrame"
+              class="h-[calc(100vh-64px)] w-full"
+              title="Project iframe"
+              loading="lazy"
+              src="about:blank"
+            ></iframe>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const projects = [
+        {
+          key: "ai-interview-coach",
+          name: "AI Interview Coach",
+          port: 5100,
+          url: "http://localhost:5100/",
+          icon: "Brain",
+          description: "Practice interviews with structured prompts and real-time facilitation cues."
+        },
+        {
+          key: "Alt-Text Generator",
+          name: "Alt-Text Generator",
+          port: 3100,
+          url: "http://localhost:3100/",
+          icon: "Image",
+          description: "Upload an image to generate accessible alt text and SEO keywords."
+        },
+        {
+          key: "email_chaser_pro",
+          name: "Email Chaser Pro",
+          port: 5102,
+          url: "http://localhost:5102/",
+          icon: "Mail",
+          description: "Track follow-ups, analyze tone, and generate nudge recommendations."
+        },
+        {
+          key: "Font_Generator",
+          name: "Font Generator",
+          port: 5103,
+          url: "http://localhost:5103/",
+          icon: "Type",
+          description: "Convert text with selectable styles and generate customized font output."
+        },
+        {
+          key: "Health_auditor",
+          name: "Health Auditor",
+          port: 5104,
+          url: "http://localhost:5104/",
+          icon: "HeartPulse",
+          description: "Log wellness data and get dashboards with insights and trends."
+        },
+        {
+          key: "Interior_AI",
+          name: "Interior AI",
+          port: 3101,
+          url: "http://localhost:3101/",
+          icon: "Home",
+          description: "Staged interior visuals from your photo with adjustable prompt strength."
+        },
+        {
+          key: "QR_code_generator",
+          name: "QR Code Generator",
+          port: 3102,
+          url: "http://localhost:3102/",
+          icon: "QrCode",
+          description: "Generate artistic error-correction QR codes using a creative prompt."
+        },
+        {
+          key: "Resume Screener",
+          name: "Resume Screener",
+          port: 5107,
+          url: "http://localhost:5107/",
+          icon: "FileText",
+          description: "Upload resumes and get similarity-driven screening and PDF exports."
+        },
+        {
+          key: "Smart_Inventory",
+          name: "Smart Inventory",
+          port: 3103,
+          url: "http://localhost:3103/",
+          icon: "Store",
+          description: "Analyze product images, manage inventory, and generate social marketing content."
+        },
+        {
+          key: "Text-to-Image",
+          name: "Text-to-Image",
+          port: 3104,
+          url: "http://localhost:3104/",
+          icon: "Wand2",
+          description: "Generate articles and images from a single prompt with a polished workflow."
+        },
+        {
+          key: "Voice_first_AI",
+          name: "Voice First AI",
+          port: 5110,
+          url: "http://localhost:5110/",
+          icon: "Headphones",
+          description: "Voice-first meeting transcription with realtime insights and facilitation events."
+        }
+      ];
+
+      const sidebarButtonsEl = document.getElementById("sidebarButtons");
+      const cardsGridEl = document.getElementById("cardsGrid");
+      const cardTemplate = document.getElementById("cardTemplate");
+      const sidebarTemplate = document.getElementById("sidebarButtonTemplate");
+
+      const homeBtn = document.getElementById("homeBtn");
+      const homeView = document.getElementById("homeView");
+      const iframeView = document.getElementById("iframeView");
+
+      const frame = document.getElementById("appFrame");
+      const activeTitle = document.getElementById("activeTitle");
+      const activeSubtitle = document.getElementById("activeSubtitle");
+      const activeUrlHint = document.getElementById("activeUrlHint");
+
+      const loadingOverlay = document.getElementById("loadingOverlay");
+      const loadingBar = document.getElementById("loadingBar");
+
+      let activeKey = null;
+      let switchingTimer = null;
+
+      function getKeyFromHash() {
+        const raw = (location.hash || "").replace("#", "").trim();
+        if (!raw) return null;
+        try {
+          return decodeURIComponent(raw);
+        } catch {
+          return raw;
+        }
+      }
+
+      function showLoading() {
+        loadingOverlay.classList.remove("hidden");
+        loadingBar.style.animation = "none";
+        loadingBar.style.width = "0%";
+        // Ensure it restarts cleanly
+        void loadingBar.offsetWidth;
+        loadingBar.style.animation = "fill 2s ease-in-out forwards";
+      }
+
+      function hideLoading() {
+        loadingOverlay.classList.add("hidden");
+        loadingBar.style.animation = "none";
+        loadingBar.style.width = "0%";
+      }
+
+      function setActive(key) {
+        activeKey = key;
+        const btns = sidebarButtonsEl.querySelectorAll("button.project-btn");
+        btns.forEach((b) => {
+          const isActive = b.getAttribute("data-key") === key;
+          b.classList.toggle("border-cyan-300/30", isActive);
+          b.classList.toggle("bg-cyan-400/10", isActive);
+          b.classList.toggle("ring-1", isActive);
+          b.classList.toggle("ring-cyan-300/20", isActive);
+          b.classList.toggle("hover:bg-white/[0.06]", !isActive);
+        });
+        const p = projects.find((x) => x.key === key);
+        if (!p) return;
+        activeTitle.textContent = p.name;
+        activeSubtitle.textContent = `Running on Port ${p.port}`;
+        activeUrlHint.textContent = p.url;
+      }
+
+      function switchToProject(key) {
+        const p = projects.find((x) => x.key === key);
+        if (!p) return;
+
+        // UI: leave home view, show iframe
+        homeView.classList.add("hidden");
+        iframeView.classList.remove("hidden");
+
+        // UI: highlight immediately
+        setActive(key);
+        location.hash = encodeURIComponent(key);
+
+        // Loading for exactly ~2 seconds
+        if (switchingTimer) clearTimeout(switchingTimer);
+        showLoading();
+        switchingTimer = setTimeout(() => {
+          frame.src = p.url;
+          hideLoading();
+        }, 2000);
+      }
+
+      function render() {
+        for (const p of projects) {
+          // Sidebar button
+          const btn = sidebarTemplate.content.firstElementChild.cloneNode(true);
+          btn.setAttribute("data-key", p.key);
+          btn.querySelector('[data-lucide="iconName"]').setAttribute("data-lucide", p.icon);
+          btn.querySelectorAll("span")[0].querySelector("i").setAttribute("data-lucide", p.icon);
+          btn.querySelector("span.flex-1 span.block").textContent = p.name;
+          btn.querySelector("span.flex-1 span.block + span.block").textContent = `(${p.port})`;
+          // More robust text fill
+          const innerTexts = btn.querySelectorAll("span.flex-1 span");
+          if (innerTexts.length >= 2) {
+            innerTexts[0].textContent = p.name;
+            innerTexts[1].textContent = `(${p.port})`;
+          }
+          sidebarButtonsEl.appendChild(btn);
+
+          // Home card
+          const card = cardTemplate.content.firstElementChild.cloneNode(true);
+          card.setAttribute("data-key", p.key);
+          card.querySelector('[data-lucide="iconName"]').setAttribute("data-lucide", p.icon);
+          const textBlocks = card.querySelectorAll("div.min-w-0 > div");
+          if (textBlocks.length) textBlocks[0].textContent = p.name;
+          if (textBlocks.length > 1) textBlocks[1].textContent = `Port ${p.port}`;
+          const desc = card.querySelector("p");
+          if (desc) desc.textContent = p.description;
+          cardsGridEl.appendChild(card);
+        }
+
+        // Attach handlers
+        sidebarButtonsEl.querySelectorAll("button.project-btn").forEach((btn) => {
+          btn.addEventListener("click", () => switchToProject(btn.getAttribute("data-key")));
+        });
+
+        cardsGridEl.querySelectorAll("button.project-card").forEach((card) => {
+          card.addEventListener("click", () => switchToProject(card.getAttribute("data-key")));
+        });
+
+        // Lucide icons
+        if (window.lucide && typeof window.lucide.createIcons === "function") {
+          window.lucide.createIcons();
+        }
+      }
+
+      homeBtn.addEventListener("click", () => {
+        homeView.classList.remove("hidden");
+        iframeView.classList.add("hidden");
+        const p = projects.find((x) => x.key === activeKey);
+        if (p) {
+          activeTitle.textContent = "Dashboard Overview";
+          activeSubtitle.textContent = "All projects";
+          activeUrlHint.textContent = "—";
+        } else {
+          activeTitle.textContent = "Select a project";
+          activeSubtitle.textContent = "Use Home for a gallery overview";
+          activeUrlHint.textContent = "—";
+        }
+        location.hash = "";
+      });
+
+      render();
+
+      // Initial state: if hash exists, open that project; otherwise show Home gallery.
+      const initialKey = getKeyFromHash();
+      if (initialKey && projects.some((p) => p.key === initialKey)) {
+        switchToProject(initialKey);
+      } else {
+        homeView.classList.remove("hidden");
+        iframeView.classList.add("hidden");
+      }
+    </script>
+
+    <style>
+      /* Tailwind doesn't know this dynamic keyframe, so keep it inline. */
+      @keyframes fill {
+        from {
+          width: 0%;
+        }
+        to {
+          width: 100%;
+        }
+      }
+
+      .desc-clamp {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    </style>
+  </body>
+</html>
+

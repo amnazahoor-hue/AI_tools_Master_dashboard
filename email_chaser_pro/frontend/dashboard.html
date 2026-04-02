@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Chaser Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <style>
+      .glass {
+        background: rgba(15, 23, 42, 0.58);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        backdrop-filter: blur(14px);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100">
+    <div class="flex min-h-screen">
+      <aside class="fixed inset-y-0 left-0 w-64 border-r border-slate-700/50 bg-slate-900/80 p-5 backdrop-blur">
+        <div class="mb-8">
+          <p class="text-xs uppercase tracking-[0.2em] text-indigo-200">Email Chaser</p>
+          <h1 class="mt-2 text-xl font-semibold">Control Center</h1>
+        </div>
+        <nav class="space-y-2 text-sm">
+          <a href="/" class="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-200 transition hover:bg-indigo-500/15">
+            <i data-lucide="house" class="h-4 w-4"></i> Home
+          </a>
+          <a href="dashboard" class="flex items-center gap-2 rounded-lg border border-indigo-300/30 bg-indigo-500/20 px-3 py-2 text-indigo-100">
+            <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Dashboard
+          </a>
+          <a href="admin" class="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-200 transition hover:bg-indigo-500/15">
+            <i data-lucide="shield-check" class="h-4 w-4"></i> Admin
+          </a>
+        </nav>
+      </aside>
+
+      <main class="ml-64 w-full px-5 py-8 md:px-8">
+        <header class="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-xs uppercase tracking-widest text-indigo-200">User Workspace</p>
+            <h2 class="text-2xl font-semibold">Active Chases</h2>
+          </div>
+          <div class="rounded-lg border border-slate-600/40 bg-slate-800/45 px-3 py-2 text-sm text-slate-200">
+            Demo User ID:
+            <input id="userIdInput" type="number" value="1" class="ml-2 w-16 rounded border border-slate-500/50 bg-slate-900/80 px-2 py-1 text-center outline-none" />
+            <button id="loadBtn" class="ml-2 rounded bg-indigo-500 px-2.5 py-1 text-white hover:bg-indigo-400">Load</button>
+          </div>
+        </header>
+
+        <section class="glass mb-5 rounded-2xl p-4">
+          <p class="mb-2 text-xs uppercase tracking-widest text-slate-300">Nudge Status Key</p>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span title="Email is not due yet." class="rounded-full border border-indigo-300/35 bg-indigo-500/15 px-2.5 py-1 text-indigo-100">Indigo Badge = Wait longer</span>
+            <span title="Follow-up should be sent now." class="rounded-full border border-amber-300/35 bg-amber-500/15 px-2.5 py-1 text-amber-100">Pulsing Amber = Nudge Today</span>
+            <span title="A draft was copied and marked as sent." class="rounded-full border border-emerald-300/35 bg-emerald-500/15 px-2.5 py-1 text-emerald-100">Green = Follow-up Sent</span>
+          </div>
+        </section>
+
+        <section class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" id="countdownGrid"></section>
+      </main>
+    </div>
+
+    <div id="draftModalOverlay" class="fixed inset-0 z-40 hidden items-center justify-center bg-slate-950/65 p-4">
+      <div id="draftModalPanel" class="glass w-full max-w-3xl rounded-2xl p-5 md:p-6">
+        <div class="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <p class="text-xs uppercase tracking-widest text-indigo-200">AI Draft Variations</p>
+            <h3 id="modalTitle" class="text-xl font-semibold">Follow-up Drafts</h3>
+          </div>
+          <button id="closeDraftModal" class="rounded-md border border-slate-500/45 p-2 hover:bg-slate-800/50">
+            <i data-lucide="x" class="h-4 w-4"></i>
+          </button>
+        </div>
+        <div id="draftList" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <div
+      id="appToast"
+      class="fixed bottom-5 right-5 z-50 rounded-lg border px-4 py-2 text-sm opacity-0 translate-y-3 transition-all duration-300"
+    ></div>
+
+    <script type="module" src="./assets/js/dashboard.js"></script>
+  </body>
+</html>

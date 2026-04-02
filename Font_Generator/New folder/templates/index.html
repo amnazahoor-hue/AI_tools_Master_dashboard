@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}Font Generator | Stylish Unicode Text{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <div class="hero-panel">
+            <p class="eyebrow">Unicode Font Studio</p>
+            <h2>Stylish Text Generator</h2>
+            <p>Type once, preview dozens of styles, and copy instantly.</p>
+            <div class="hero-chips">
+                <span>40+ Styles</span>
+                <span>One-Tap Copy</span>
+                <span>Mobile Optimized</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="tool-section">
+    <div class="container">
+        <div class="input-wrap">
+            <label for="sourceText">Input Text</label>
+            <textarea id="sourceText" rows="3" maxlength="280" placeholder="Type your text here..."></textarea>
+            <div class="input-meta">
+                <small id="charCount">0 / 280</small>
+                <small id="nonLatinHint" class="hint"></small>
+            </div>
+        </div>
+
+        <div id="fontGrid" class="font-grid" aria-live="polite"></div>
+        <div id="loadingMore" class="loading-more" hidden>Loading more styles...</div>
+    </div>
+</section>
+{% endblock %}

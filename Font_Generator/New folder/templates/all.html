@@ -1,0 +1,74 @@
+<!-- This is without template inheritance /Single html file for wordpress-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional Font Generator - convert plain text into stylish Unicode fonts instantly.">
+    <title>Font Generator | Stylish Unicode Text</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <div class="bg-orb orb-1" aria-hidden="true"></div>
+    <div class="bg-orb orb-2" aria-hidden="true"></div>
+    <div class="bg-orb orb-3" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <div class="container header-inner">
+            <div class="brand-mark" aria-hidden="true">F</div>
+            <div>
+                <h1 class="brand-title">Font Generator</h1>
+                <p class="brand-subtitle">Generate stylish Unicode text in one tap</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-panel">
+                    <p class="eyebrow">Unicode Font Studio</p>
+                    <h2>Stylish Text Generator</h2>
+                    <p>Type once, preview dozens of styles, and copy instantly.</p>
+                    <div class="hero-chips">
+                        <span>40+ Styles</span>
+                        <span>One-Tap Copy</span>
+                        <span>Mobile Optimized</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-section">
+            <div class="container">
+                <div class="input-wrap">
+                    <label for="sourceText">Input Text</label>
+                    <textarea id="sourceText" rows="3" maxlength="280" placeholder="Type your text here..."></textarea>
+                    <div class="input-meta">
+                        <small id="charCount">0 / 280</small>
+                        <small id="nonLatinHint" class="hint"></small>
+                    </div>
+                </div>
+
+                <div id="fontGrid" class="font-grid" aria-live="polite"></div>
+                <div id="loadingMore" class="loading-more" hidden>Loading more styles...</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>&copy; 2026 Font Generator. Built for speed and mobile-first UX.</p>
+        </div>
+    </footer>
+
+    <div class="toast" id="copyToast" role="status" aria-live="polite">Copied!</div>
+
+    <script src="static/js/main.js" defer></script>
+</body>
+</html>

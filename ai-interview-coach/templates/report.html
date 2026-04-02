@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}
+REPORT
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-3">
+  <div class="report-screen">
+
+    <h2 class="text-center mb-4">Interview Report</h2>
+
+    <!-- Average Score -->
+    <div class="card p-3 mb-4 text-center">
+        <h4>Average Score</h4>
+        <h1 class="score">{{ average }}/10</h1>
+    </div>
+
+    <!-- Table: Scores + Summary -->
+    <div class="card p-3 mb-4">
+        <h5>Performance Breakdown</h5>
+
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Question</th>
+                        <th>Score</th>
+                        <th>Summary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in report_data %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td class="text-start">{{ item.question }}</td>
+                        <td>{{ item.score }}/10</td>
+                        <td class="text-start">{{ item.summary }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Debug info to verify data length -->
+        <div class="mt-2 text-muted small">
+            Total questions evaluated: {{ report_data|length }}
+        </div>
+    </div>
+
+    <!-- Overall Strengths -->
+    <div class="card p-3 mb-4">
+        <h5 class="text-success">Overall Strengths</h5>
+        <p class="mt-2">{{ strengths }}</p>
+    </div>
+
+    <!-- Areas of Improvement -->
+    <div class="card p-3 mb-4">
+        <h5 class="text-danger">Areas for Improvement</h5>
+        <p class="mt-2">{{ improvements }}</p>
+    </div>
+
+    <!-- Final Verdict -->
+    <div class="card p-3 mb-4 text-center">
+        {% if average >= 8 %}
+            <h5 class="text-success">Excellent Performance</h5>
+        {% elif average >= 5 %}
+            <h5 class="text-warning">Good, but needs improvement </h5>
+        {% else %}
+            <h5 class="text-danger">Needs serious improvement </h5>
+        {% endif %}
+    </div>
+
+    <div class="text-end mb-3">
+            <a href="/export-pdf" class="btn btn-success" target="_blank">
+                   Export as PDF
+            </a>
+    </div>
+
+
+    <!-- Reset -->
+    <div class="text-center">
+        <a href="/reset" class="btn btn-primary">Start New Interview</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/bootstrap-5.3.8-dist/js/bootstrap.min.js"></script>
+
+{% endblock %}
+</body>
+</html>

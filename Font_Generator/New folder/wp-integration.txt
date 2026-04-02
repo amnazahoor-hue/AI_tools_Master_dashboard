@@ -1,0 +1,45 @@
+WordPress Shortcode Integration
+===============================
+
+Use the following code in a custom plugin or your theme's functions.php:
+
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+function fg_register_assets() {
+    // Optional if you host a static build under WordPress.
+    wp_register_style('fg-style', 'https://your-flask-domain.com/static/css/style.css', array(), '1.0.0');
+    wp_register_script('fg-script', 'https://your-flask-domain.com/static/js/main.js', array(), '1.0.0', true);
+}
+add_action('wp_enqueue_scripts', 'fg_register_assets');
+
+function fg_font_generator_shortcode($atts = array()) {
+    $atts = shortcode_atts(
+        array(
+            'mode' => 'iframe', // iframe or assets
+            'src' => 'https://your-flask-domain.com/',
+            'height' => '900'
+        ),
+        $atts,
+        'font_generator_tool'
+    );
+
+    if ($atts['mode'] === 'assets') {
+        wp_enqueue_style('fg-style');
+        wp_enqueue_script('fg-script');
+        return '<div id="font-generator-root"><p>Load your Flask template markup here if using mirrored assets.</p></div>';
+    }
+
+    $src = esc_url($atts['src']);
+    $height = max(400, intval($atts['height']));
+
+    return '<iframe src="' . $src . '" loading="lazy" style="width:100%;height:' . $height . 'px;border:0;border-radius:12px;" title="Font Generator"></iframe>';
+}
+add_shortcode('font_generator_tool', 'fg_font_generator_shortcode');
+
+Usage:
+[font_generator_tool]
+[font_generator_tool src="https://your-flask-domain.com/" height="1000"]
+[font_generator_tool mode="assets"]

@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart-Log Auditor - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        background: radial-gradient(circle at top left, #e2e8f0, #f8fafc 45%, #ecfdf5);
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 8px 32px rgba(31, 41, 55, 0.12);
+        backdrop-filter: blur(12px);
+      }
+      .spinner {
+        border: 3px solid rgba(15, 23, 42, 0.12);
+        border-top: 3px solid rgb(16, 185, 129);
+        border-radius: 9999px;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .toast {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 50;
+        transition: all 250ms ease;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-slate-800">
+    <main class="max-w-6xl mx-auto p-6 md:p-10">
+      <section class="glass-card mb-5 rounded-2xl p-4 border border-emerald-100 bg-emerald-50/70">
+        <p class="text-sm uppercase tracking-wide text-emerald-700 font-semibold">Pro Tip</p>
+        <p id="pro-tip-text" class="text-emerald-900 mt-1">Loading your personalized advice...</p>
+      </section>
+
+      <section
+        id="daily-banner"
+        class="glass-card mb-5 rounded-2xl p-4 border border-amber-100 bg-amber-50/70"
+      >
+        <p id="daily-banner-text" class="font-medium text-amber-900">
+          How was your sleep last night?
+        </p>
+      </section>
+
+      <header class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold">Smart-Log Health & Productivity Auditor</h1>
+        <p class="text-slate-600 mt-2">Track your daily data and get local AI-powered insights for free.</p>
+      </header>
+
+      <section class="glass-card rounded-2xl p-5 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold text-slate-900">Quick-Log</h2>
+          <div id="audit-loading" class="hidden items-center gap-2 text-sm text-slate-600">
+            <div class="spinner"></div>
+            <span>AI is calculating weekly audit...</span>
+          </div>
+        </div>
+        <form id="quick-log-form" class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+          <div>
+            <label class="text-sm text-slate-600">Date</label>
+            <input id="date" type="date" class="w-full rounded-xl border border-slate-200 p-2.5 bg-white/70" required />
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Sleep (hrs)</label>
+            <input id="sleep_hours" type="number" min="0" max="24" step="0.1" class="w-full rounded-xl border border-slate-200 p-2.5 bg-white/70" required />
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Steps</label>
+            <input id="steps" type="number" min="0" class="w-full rounded-xl border border-slate-200 p-2.5 bg-white/70" required />
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Focus <span id="focus-value">7</span></label>
+            <input id="focus_score" type="range" min="1" max="10" value="7" class="w-full accent-emerald-600" />
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Mood <span id="mood-value">7</span></label>
+            <input id="mood_score" type="range" min="1" max="10" value="7" class="w-full accent-emerald-600" />
+          </div>
+          <button class="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white p-2.5 font-medium h-[42px]">Save Entry</button>
+        </form>
+      </section>
+
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <article class="glass-card rounded-2xl p-6 lg:col-span-1">
+          <h2 class="text-xl font-semibold mb-4">User Profile</h2>
+          <form id="user-form" class="space-y-3 mb-6">
+            <input id="username" class="w-full rounded-xl border border-slate-200 p-3 bg-white/70" placeholder="Username" required />
+            <input id="email" type="email" class="w-full rounded-xl border border-slate-200 p-3 bg-white/70" placeholder="Email" required />
+            <button class="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white p-3 font-medium">Create / Update Session User</button>
+          </form>
+          <button id="demo-btn" class="w-full rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white p-3 font-medium mb-6">
+            Try with Demo Data
+          </button>
+
+          <p id="status" class="text-sm mt-3 text-slate-600"></p>
+        </article>
+
+        <article class="glass-card rounded-2xl p-6 lg:col-span-2">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xl font-semibold">7-Day Focus vs Sleep</h2>
+            <button id="refresh-btn" class="rounded-xl px-4 py-2 bg-slate-900 text-white text-sm">Refresh</button>
+          </div>
+          <div class="h-72">
+            <canvas id="focusSleepChart"></canvas>
+          </div>
+          <div class="mt-6 rounded-xl border border-indigo-100 bg-indigo-50 p-4">
+            <h3 class="font-semibold text-indigo-900">Smart Insight</h3>
+            <p id="insight-text" class="text-indigo-900 mt-2">Add at least 2 logs to get local AI insights.</p>
+          </div>
+          <div class="mt-6 rounded-xl border border-slate-200 bg-white/70 p-4">
+            <h3 class="font-semibold text-slate-800 mb-2">Correlation Heatmap</h3>
+            <p class="text-sm text-slate-600 mb-3">Green = strongly linked, Gray = not strongly linked.</p>
+            <div class="h-52">
+              <canvas id="correlationHeatmap"></canvas>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+    <div id="toast" class="toast hidden rounded-xl bg-emerald-600 text-white px-4 py-3 shadow-lg">Log Saved!</div>
+
+    <script type="module">
+      import { createUser, createLog, getDashboardData, seedDemoData } from "/assets/js/api.js";
+      import { renderCorrelationHeatmap, renderFocusSleepChart } from "/assets/js/charts.js";
+
+      const statusEl = document.getElementById("status");
+      const insightEl = document.getElementById("insight-text");
+      const refreshBtn = document.getElementById("refresh-btn");
+      const demoBtn = document.getElementById("demo-btn");
+      const bannerEl = document.getElementById("daily-banner");
+      const bannerTextEl = document.getElementById("daily-banner-text");
+      const proTipEl = document.getElementById("pro-tip-text");
+      const toastEl = document.getElementById("toast");
+      const loadingEl = document.getElementById("audit-loading");
+      const focusSlider = document.getElementById("focus_score");
+      const moodSlider = document.getElementById("mood_score");
+      const focusValueEl = document.getElementById("focus-value");
+      const moodValueEl = document.getElementById("mood-value");
+
+      let currentUserId = Number(localStorage.getItem("smart_log_user_id")) || null;
+      let currentUsername = localStorage.getItem("smart_log_username") || "there";
+
+      function setStatus(message, isError = false) {
+        statusEl.textContent = message;
+        statusEl.className = `text-sm mt-3 ${isError ? "text-rose-600" : "text-slate-600"}`;
+      }
+
+      function getToday() {
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function showToast(message) {
+        toastEl.textContent = message;
+        toastEl.classList.remove("hidden");
+        setTimeout(() => toastEl.classList.add("hidden"), 1800);
+      }
+
+      function setLoading(isLoading) {
+        loadingEl.className = isLoading
+          ? "flex items-center gap-2 text-sm text-slate-600"
+          : "hidden items-center gap-2 text-sm text-slate-600";
+      }
+
+      function updateDailyBanner(loggedToday, insightText) {
+        const positive = (insightText || "").toLowerCase().includes("positive insight");
+        if (positive) {
+          bannerEl.className = "glass-card mb-5 rounded-2xl p-4 border border-emerald-100 bg-emerald-50/80";
+          bannerTextEl.className = "font-medium text-emerald-900";
+          bannerTextEl.textContent = `Excellent momentum, ${currentUsername}! Your habits are strongly aligned today.`;
+          return;
+        }
+
+        if (loggedToday) {
+          bannerEl.className = "glass-card mb-5 rounded-2xl p-4 border border-sky-100 bg-sky-50/70";
+          bannerTextEl.className = "font-medium text-sky-900";
+          bannerTextEl.textContent = `Great work, ${currentUsername}. Today's log is already saved.`;
+          return;
+        }
+
+        bannerEl.className = "glass-card mb-5 rounded-2xl p-4 border border-amber-100 bg-amber-50/70";
+        bannerTextEl.className = "font-medium text-amber-900";
+        bannerTextEl.textContent = `How was your sleep last night, ${currentUsername}?`;
+      }
+
+      function prefillWithPredictedGoals(goals) {
+        if (!goals) return;
+        const sleepInput = document.getElementById("sleep_hours");
+        const stepsInput = document.getElementById("steps");
+        const focusInput = document.getElementById("focus_score");
+        const moodInput = document.getElementById("mood_score");
+
+        if (!sleepInput.value) sleepInput.value = goals.sleep_hours ?? "";
+        if (!stepsInput.value) stepsInput.value = goals.steps ?? "";
+        if (!focusInput.value) focusInput.value = goals.focus_score ?? "";
+        if (!moodInput.value) moodInput.value = goals.mood_score ?? "";
+      }
+
+      async function refreshDashboard() {
+        if (!currentUserId) {
+          setStatus("Create a user profile first to load dashboard data.");
+          updateDailyBanner(false, "");
+          return;
+        }
+
+        try {
+          setLoading(true);
+          const payload = await getDashboardData(currentUserId, 7);
+          currentUsername = payload.username || currentUsername;
+          localStorage.setItem("smart_log_username", currentUsername);
+          renderFocusSleepChart("focusSleepChart", payload.logs || []);
+          renderCorrelationHeatmap("correlationHeatmap", payload.correlation_matrix);
+          prefillWithPredictedGoals(payload.predicted_goals);
+          focusValueEl.textContent = document.getElementById("focus_score").value;
+          moodValueEl.textContent = document.getElementById("mood_score").value;
+          const insight = payload.insight?.insight || "No insight yet.";
+          const corr = payload.insight?.correlation;
+          insightEl.textContent = corr !== undefined ? `${insight} (r=${corr})` : insight;
+          proTipEl.textContent = payload.daily_advice || "Your daily tip will appear here.";
+          updateDailyBanner(Boolean(payload.logged_today), insight);
+        } catch (err) {
+          setStatus(err.message, true);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      document.getElementById("date").value = getToday();
+
+      document.getElementById("user-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const username = document.getElementById("username").value.trim();
+        const email = document.getElementById("email").value.trim();
+        try {
+          const user = await createUser(username, email);
+          currentUserId = Number(user.id);
+          currentUsername = user.username;
+          localStorage.setItem("smart_log_user_id", String(currentUserId));
+          localStorage.setItem("smart_log_username", String(currentUsername));
+          setStatus(`User ready: ${user.username} (ID ${user.id})`);
+          await refreshDashboard();
+        } catch (err) {
+          setStatus(err.message, true);
+        }
+      });
+
+      document.getElementById("quick-log-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!currentUserId) {
+          setStatus("Create a user first before logging daily entries.", true);
+          return;
+        }
+
+        const payload = {
+          user_id: currentUserId,
+          date: document.getElementById("date").value,
+          sleep_hours: Number(document.getElementById("sleep_hours").value),
+          steps: Number(document.getElementById("steps").value),
+          focus_score: Number(document.getElementById("focus_score").value),
+          mood_score: Number(document.getElementById("mood_score").value)
+        };
+
+        try {
+          await createLog(payload);
+          setStatus("Daily log saved successfully.");
+          showToast("Log Saved!");
+          await refreshDashboard();
+        } catch (err) {
+          setStatus(err.message, true);
+        }
+      });
+
+      focusSlider.addEventListener("input", () => {
+        focusValueEl.textContent = focusSlider.value;
+      });
+      moodSlider.addEventListener("input", () => {
+        moodValueEl.textContent = moodSlider.value;
+      });
+
+      demoBtn.addEventListener("click", async () => {
+        if (!currentUserId) {
+          setStatus("Create a user first, then click demo mode.", true);
+          return;
+        }
+        try {
+          await seedDemoData(currentUserId);
+          setStatus("Demo data loaded for the last 14 days.");
+          await refreshDashboard();
+        } catch (err) {
+          setStatus(err.message, true);
+        }
+      });
+
+      refreshBtn.addEventListener("click", refreshDashboard);
+      refreshDashboard();
+    </script>
+  </body>
+  </html>

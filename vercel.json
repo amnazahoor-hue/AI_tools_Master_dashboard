@@ -1,0 +1,13 @@
+{
+    "version": 2,
+    "builds": [
+      { "src": "index.html", "use": "@vercel/static" },
+      { "src": "*/backend/app.py", "use": "@vercel/python" },
+      { "src": "*/frontend/package.json", "use": "@vercel/static-build" }
+    ],
+    "rewrites": [
+      { "source": "/api/qr/(.*)", "destination": "/QR_code_generator/backend/app.py" },
+      { "source": "/api/interview/(.*)", "destination": "/ai-interview-coach/backend/app.py" },
+      { "source": "/qr", "destination": "/QR_code_generator/frontend/index.html" }
+    ]
+  }

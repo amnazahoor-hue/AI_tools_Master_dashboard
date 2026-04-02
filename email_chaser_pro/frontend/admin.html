@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Chaser Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100">
+    <div class="flex min-h-screen">
+      <aside class="fixed inset-y-0 left-0 w-64 border-r border-slate-700/50 bg-slate-900/80 p-5 backdrop-blur">
+        <div class="mb-8">
+          <p class="text-xs uppercase tracking-[0.2em] text-indigo-200">Email Chaser</p>
+          <h1 class="mt-2 text-xl font-semibold">Control Center</h1>
+        </div>
+        <nav class="space-y-2 text-sm">
+          <a href="/" class="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-200 transition hover:bg-indigo-500/15">
+            <i data-lucide="house" class="h-4 w-4"></i> Home
+          </a>
+          <a href="dashboard" class="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-200 transition hover:bg-indigo-500/15">
+            <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Dashboard
+          </a>
+          <a href="admin" class="flex items-center gap-2 rounded-lg border border-indigo-300/30 bg-indigo-500/20 px-3 py-2 text-indigo-100">
+            <i data-lucide="shield-check" class="h-4 w-4"></i> Admin
+          </a>
+        </nav>
+      </aside>
+
+      <main class="ml-64 w-full px-5 py-8 md:px-8">
+        <header class="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-xs uppercase tracking-widest text-indigo-200">Executive View</p>
+            <h2 class="text-2xl font-semibold">Admin Analytics</h2>
+          </div>
+          <div id="systemHealthBadge" class="inline-flex items-center gap-2 rounded-full border border-slate-500/45 bg-slate-800/45 px-3 py-1 text-xs text-slate-100">
+            <span class="h-2 w-2 rounded-full bg-slate-300"></span>
+            Checking status...
+          </div>
+        </header>
+
+        <section class="mb-6 grid gap-3 md:grid-cols-3">
+          <article class="glass-card rounded-xl px-4 py-3">
+            <p class="text-xs uppercase tracking-widest text-slate-300">Total Chases</p>
+            <p id="totalChasesRibbon" class="mt-1 text-2xl font-semibold">0</p>
+          </article>
+          <article class="glass-card rounded-xl px-4 py-3">
+            <p class="text-xs uppercase tracking-widest text-slate-300">Active Waiters</p>
+            <p id="activeWaitersRibbon" class="mt-1 text-2xl font-semibold">0</p>
+          </article>
+          <article class="glass-card rounded-xl px-4 py-3">
+            <p class="text-xs uppercase tracking-widest text-slate-300">Nudges Sent Today</p>
+            <p id="sentTodayRibbon" class="mt-1 text-2xl font-semibold">0</p>
+          </article>
+        </section>
+
+        <section class="mb-6 grid gap-4 sm:grid-cols-3">
+          <article class="glass-card animate-fade-in-up rounded-2xl p-5">
+            <p class="text-xs uppercase tracking-widest text-slate-300">Total Users</p>
+            <p id="totalUsers" class="mt-2 text-3xl font-semibold">0</p>
+          </article>
+          <article class="glass-card animate-fade-in-up rounded-2xl p-5" style="animation-delay: 90ms">
+            <p class="text-xs uppercase tracking-widest text-slate-300">Emails Analyzed</p>
+            <p id="totalEmails" class="mt-2 text-3xl font-semibold">0</p>
+          </article>
+          <article class="glass-card animate-fade-in-up rounded-2xl p-5" style="animation-delay: 140ms">
+            <p class="text-xs uppercase tracking-widest text-slate-300">Most Used Tone</p>
+            <p id="mostUsedTone" class="mt-2 text-3xl font-semibold">N/A</p>
+          </article>
+        </section>
+
+        <section class="grid gap-4 xl:grid-cols-3">
+          <article class="glass-card animate-fade-in-up rounded-2xl p-5 xl:col-span-2">
+            <div class="mb-4 flex items-center justify-between">
+              <h3 class="text-lg font-semibold">Emails Sent per Day</h3>
+              <p class="text-xs text-slate-300">Last 7 days</p>
+            </div>
+            <div class="h-80">
+              <canvas id="barChart"></canvas>
+            </div>
+          </article>
+          <article class="glass-card animate-fade-in-up rounded-2xl p-5" style="animation-delay: 120ms">
+            <div class="mb-4 flex items-center justify-between">
+              <h3 class="text-lg font-semibold">Tone Distribution</h3>
+              <p class="text-xs text-slate-300">Copied draft mix</p>
+            </div>
+            <div class="h-80">
+              <canvas id="pieChart"></canvas>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <div
+      id="appToast"
+      class="fixed bottom-5 right-5 z-50 rounded-lg border px-4 py-2 text-sm opacity-0 translate-y-3 transition-all duration-300"
+    ></div>
+
+    <script type="module" src="./assets/js/charts.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

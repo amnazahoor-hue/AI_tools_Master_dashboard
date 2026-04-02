@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart-Log Auditor - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        background: radial-gradient(circle at top right, #e0e7ff, #f8fafc 45%, #cffafe);
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.64);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+        backdrop-filter: blur(12px);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-slate-800">
+    <main class="max-w-6xl mx-auto p-6 md:p-10">
+      <header class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold">Admin Panel</h1>
+        <p class="text-slate-600 mt-2">Platform-level data quality and usage monitoring.</p>
+      </header>
+
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <article class="glass-card rounded-2xl p-5">
+          <p class="text-sm text-slate-500">Total Users</p>
+          <p id="total-users" class="text-3xl font-bold mt-1">0</p>
+        </article>
+        <article class="glass-card rounded-2xl p-5">
+          <p class="text-sm text-slate-500">Total Logs</p>
+          <p id="total-logs" class="text-3xl font-bold mt-1">0</p>
+        </article>
+        <article class="glass-card rounded-2xl p-5">
+          <p class="text-sm text-slate-500">System Avg Mood</p>
+          <p id="avg-mood" class="text-3xl font-bold mt-1">0.00</p>
+        </article>
+      </section>
+
+      <section class="glass-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold">Data Health: Daily Active Logging Users</h2>
+          <button id="refresh-admin" class="rounded-xl px-4 py-2 bg-slate-900 text-white text-sm">Refresh</button>
+        </div>
+        <div class="h-80">
+          <canvas id="dataHealthChart"></canvas>
+        </div>
+        <p id="admin-status" class="text-sm text-slate-600 mt-4"></p>
+      </section>
+    </main>
+
+    <script type="module">
+      import { getAdminMetrics } from "/assets/js/api.js";
+
+      const totalUsersEl = document.getElementById("total-users");
+      const totalLogsEl = document.getElementById("total-logs");
+      const avgMoodEl = document.getElementById("avg-mood");
+      const statusEl = document.getElementById("admin-status");
+      const refreshBtn = document.getElementById("refresh-admin");
+
+      let chartInstance = null;
+
+      function setStatus(message, isError = false) {
+        statusEl.textContent = message;
+        statusEl.className = `text-sm mt-4 ${isError ? "text-rose-600" : "text-slate-600"}`;
+      }
+
+      function renderDataHealth(dailyActivity) {
+        const labels = dailyActivity.map((d) => d.date);
+        const values = dailyActivity.map((d) => d.active_users);
+
+        const ctx = document.getElementById("dataHealthChart");
+        if (chartInstance) chartInstance.destroy();
+
+        chartInstance = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Active Users",
+                data: values,
+                borderWidth: 1,
+                backgroundColor: "rgba(59, 130, 246, 0.55)",
+                borderColor: "rgba(37, 99, 235, 1)"
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { precision: 0 }
+              }
+            }
+          }
+        });
+      }
+
+      async function refreshAdmin() {
+        try {
+          const metrics = await getAdminMetrics();
+          totalUsersEl.textContent = metrics.total_users ?? 0;
+          totalLogsEl.textContent = metrics.total_logs ?? 0;
+          avgMoodEl.textContent = Number(metrics.average_mood ?? 0).toFixed(2);
+          renderDataHealth(metrics.daily_activity ?? []);
+          setStatus("Admin metrics loaded.");
+        } catch (err) {
+          setStatus(err.message, true);
+        }
+      }
+
+      refreshBtn.addEventListener("click", refreshAdmin);
+      refreshAdmin();
+    </script>
+  </body>
+  </html>
